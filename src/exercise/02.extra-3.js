@@ -3,13 +3,23 @@
 
 import * as React from 'react';
 
+function useLocalStorageState(key, defaultValue = '') {
+  const [state, setState] = React.useState(
+    () => window.localStorage.getItem(key) || defaultValue,
+  );
+
+  React.useEffect(() => {
+    window.localStorage.setItem(key, state);
+  }, [key, state]);
+
+  return [state, setState];
+}
+
 function Greeting({initialName = ''}) {
   // It is not great for our performance because every single time we type a character, we're reading out of localStorage.
   // We don't need to because we already did that the first time. We don't care about that value thereafter.
   // React’s useState hook allows you to pass a function instead of the actual value, and then it will only call that function to get the state value when the component is rendered the first time
-  const [name, setName] = React.useState(
-    () => window.localStorage.getItem('name') || initialName,
-  );
+  const [name, setName] = useLocalStorageState('name', initialName);
 
   // React.useEffect allows you to pass a second argument called the "dependency array" which signals to React that your effect callback function should be called when (and only when) those dependencies change.
   React.useEffect(() => {
